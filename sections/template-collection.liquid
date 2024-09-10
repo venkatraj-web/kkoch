@@ -1,33 +1,147 @@
-<div class="px-4 py-8">
-    <a href="{{ routes.collections_url }}" class="text-base text-gray-500 hover:underline text-center block my-4">Go back to collections</a>
-    {% paginate collection.products by section.settings.number_of_products_per_page %}
-        <h1 class="text-3xl text-center">{{ collection.title }}</h1>
+<div class="px-4 py-8 max-w-6xl mx-auto">
+    {% comment %} <a href="{{ routes.collections_url }}" class="text-base text-gray-500 hover:underline text-center block my-4">Go
+        back to collections</a> {% endcomment %}
+        <h1 class="text-3xl text-center">Collection: {{ collection.title }}</h1>
+        {%- comment -%}
+        Find if there is any filter applied
+      {%- endcomment -%}
+      {% assign hasFilter = false %}
+      {%- for filter in collection.filters -%}
+        {%- for filter_value in filter.active_values -%}
+            {% assign hasFilter = true %}
+        {% endfor %}
+      {% endfor %}
 
-        <div class="max-w-6xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {% for product in collection.products %}
-                    {% render 'product-card', product_product: product %}
-                {% else %}
-                    <p>There are no products inside of this collection</p>
-                {% endfor %}
+      <div class="active-filters flex space-x-3 items-center">
+          {% if hasFilter %}
+            <a href="{{ collection.url }}?sort_by={{ collection.sort_by }}" class="active-filters__clear flex items-center border text-white text-sm py-1 px-3 bg-[#757575] rounded-full">
+              Clear all
+              <span>{% render 'icon-close', class: 'ml-2 w-5' %}</span>
+            </a>
+          {% endif %}
+
+          {%- for filter in collection.filters -%}
+            {%- if filter.type == "price_range" -%}
+              {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+                <a class="active-filters__remove-filter flex items-center border text-sm py-1 px-3 bg-[#d6d6d6] rounded-full" href="{{ filter.url_to_remove }}">
+                  {%- assign min_value = filter.min_value.value | default: 0 -%}
+                  {%- assign max_value = filter.max_value.value | default: filter.range_max -%}
+                  {{ min_value | money }} - {{ max_value | money }} <span>{% render 'icon-close', class: 'ml-2 w-5' %}</span>
+                </a>
+              {%- endif -%}
+            {%- else -%}
+              {%- for filter_value in filter.active_values -%}
+                <a class="active-filters__remove-filter flex items-center border text-sm py-1 px-3 bg-[#d6d6d6] rounded-full" href="{{ filter_value.url_to_remove }}">
+                  {{ filter_value.label }} <span>{% render 'icon-close', class: 'ml-2 w-5' %}</span>
+                </a>
+              {%- endfor -%}
+            {%- endif- %}
+          {%- endfor -%}
+      </div>
+    
+    {% assign sort_by = collection.sort_by | default: collection.default_sort_by %}
+
+    <div class="collection__sort page-width flex justify-end" 
+        x-data="{
+            loading: false,
+            sort: '{{ sort_by }}',
+            sortCollection()  {
+                this.loading = true;
+                fetch('/collections/{{ collection.handle }}?sort_by=' + this.sort)
+              .then(response => response.text())
+              .then(data => {
+              
+                history.replaceState(null, null, '?sort_by=' + this.sort);
+                let html_div = document.createElement('div');
+                html_div.innerHTML = data;
+  
+                let html_dom = html_div.querySelector('#ProductGridContainer').innerHTML;
+                document.querySelector('#ProductGridContainer').innerHTML = html_dom;
+                // update url without refreshing the page 
+                history.replaceState(null, null, '?sort_by=' + this.sort);
+              })
+              .catch(error => console.error('Error:', error))
+              .finally(() => this.loading = false);
+            }
+        }"
+    >
+
+        {% comment %} {% render 'loader' %}
+        <select id="sort-by" x-model="sort" @change="sortCollection()" class="border border-black py-3 px-4 my-3">
+    
+            {% for option in collection.sort_options %}
+            <option value="{{ option.value }}" {% if option.value==sort_by %}selected="selected" {% endif %}>
+                {{ option.name }}
+            </option>
+            {% endfor %}
+        </select> {% endcomment %}
+    
+        {% comment %} <script>
+            Shopify.queryParams = {};
+    
+            // Preserve existing query parameters
+            if (location.search.length) {
+                var params = location.search.substr(1).split('&');
+    
+                for (var i = 0; i < params.length; i++) {
+                    var keyValue = params[i].split('=');
+    
+                    if (keyValue.length) {
+                        Shopify.queryParams[decodeURIComponent(keyValue[0])] = decodeURIComponent(keyValue[1]);
+                    }
+                }
+            }
+    
+            // Update sort_by query parameter on select change
+            document.querySelector('#sort-by').addEventListener('change', function (e) {
+                var value = e.target.value;
+    
+                Shopify.queryParams.sort_by = value;
+                location.search = new URLSearchParams(Shopify.queryParams).toString();
+            });
+        </script> {% endcomment %}
+
+    </div>
+
+    <div class="flex flex-col md:flex-row">
+        <div class="w-full md:w-3/12 mt-4">
+            {% render 'filters' %}
+        </div>
+        <div class="w-full md:w-9/12">
+            <div id="productGridContainer">
+                {% paginate collection.products by section.settings.number_of_products_per_page %}
+                    
+                
+                    <div class="max-w-6xl mx-auto">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {% for product in collection.products %}
+                                {% render 'product-card', productData: product %}
+                            {% else %}
+                                <p>There are no products inside of this collection</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                
+                    {% render 'pagination', pagination: paginate %}
+                {% endpaginate %}
+        
             </div>
         </div>
-        
+    </div>
 
-        {% render 'pagination', pagination: paginate %}
-    {% endpaginate %}
-</div>
+</div> 
 
 {% schema %}
 {
-    "name": "Template Collection",
-    "settings": [
-        {
-            "type": "number",
-            "id": "number_of_products_per_page",
-            "default": 6,
-            "label": "Number of products per page"
-        }
-    ]
+"name": "Template Collection",
+"settings": [
+{
+"type": "number",
+"id": "number_of_products_per_page",
+"default": 6,
+"label": "Number of products per page"
+}
+]
 }
 {% endschema %}

@@ -1,11 +1,75 @@
 {
-    "sections": {
-        "featured-collection": {
-            "type": "featured-collection",
-            "settings": {
-                "featured_collection": "all"
-            }
-        }
+  "sections": {
+    "banner-collection": {
+      "type": "banner-collection",
+      "settings": {
+        // "banner_collection": "all"
+      }
     },
-    "order": ["featured-collection"]
+    "featured-collection": {
+      "type": "featured-collection",
+      "settings": {
+        "featured_collection": "all"
+      }
+    },
+    "decoration-type": {
+      "type": "featured-collection",
+      "settings": {
+        "featured_collection": "all",
+        "title": "Decoration Type"
+      }
+    },
+    "bouquets-type": {
+      "type": "featured-collection",
+      "settings": {
+        "featured_collection": "all",
+        "title": "Bouquets Type"
+      }
+    },
+    "send-gifts": {
+      "type": "featured-collection",
+      "settings": {
+        "featured_collection": "all",
+        "title": "Send Your Gifts"
+      }
+    },
+    "recipients": {
+      "type": "section-image",
+      "settings": {
+        "title": "Recipients"
+      }
+    },
+    "plants": {
+      "type": "slick-slider",
+      "settings": {
+        // "featured_collection": "all"
+        "title": "Plants"
+      }
+    },
+    "dry-flowers": {
+      "type": "slick-slider",
+      "settings": {
+        // "featured_collection": "all"
+        "title": "Dry Flowers"
+      }
+    },
+    "partners-section": {
+      "type": "partners-section",
+      "settings": {
+        // "featured_collection": "all"
+        "heading": "Partners"
+      }
+    }
+  },
+  "order": [
+    "banner-collection",
+    "featured-collection",
+    "decoration-type",
+    "bouquets-type",
+    "send-gifts",
+    "recipients",
+    "plants",
+    "dry-flowers",
+    "partners-section"
+  ]
 }

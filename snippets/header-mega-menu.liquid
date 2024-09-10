@@ -1,0 +1,59 @@
+<nav class="cloud space-x-10">
+    <div class="flex space-x-10">
+    {% for link in main_menu_linklists %}
+        {% if link.links != blank %}
+        <div x-data="{ open: false }" class="static block" x-on:mouseenter="open = true" 
+        x-on:mouseleave="open = false">
+        <div class="inline-flex items-center hover:text-gray-700">
+            <span class="link uppercase">{{link.title}}</span>
+            {% render 'icon-dropdown' %}
+        </div>
+
+        <div x-show="open" @mouseenter.away="open = false"
+            class="absolute z-[999] left-[1rem] 2xl:left-[17rem] right-0 px-3 py-5 mx-3 max-w-6xl">
+            <div class="shadow-lg border ring-black ring-opacity-5 overflow-hidden rounded-lg">
+            <div class="flex md:flex-wrap lg:flex gap-6 cloud px-3 py-3 sm:gap-8 sm:p-2">
+
+                <!-- CREATE THE SUBLINK -->
+                {% for childlink in link.links %}
+                    {% if childlink.links != blank %}
+                        <a href="{{childlink.url}}" class="-m-3 p-3 flex items-start ">
+                            <div class="ml-4">
+                                <span class="text-white-900 link font-bold">
+                                    {{ childlink.title | escape }}
+                                </span>
+                                {% if childlink.links != blank %}
+                                    <ul>
+                                    {% for grandchildlink in childlink.links %}
+                                        <li class="leading-8">
+                                            <a href="{{ grandchildlink.url }}" class="hover:text-[#23463F] link" id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle  }}">
+                                                {{ grandchildlink.title | escape }}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                    </ul>
+                                {% endif %}
+                                
+                            </div>
+                        </a>
+                    {% else %}
+                        <div class="relative">
+                            <a href="{{ childlink.url }}" class="text-base text-white-500 hover:text-white-900">{{childlink.title}}</a>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+            </div>
+            </div>
+        </div>
+
+        </div>
+        {% else %}
+            <div class="relative">
+                <a href="{{ link.url }}" class="text-white-500 hover:text-gray-700 link uppercase">{{link.title}}</a>
+            </div>
+        {% endif %}
+    {% endfor %}
+    </div>
+
+</nav>

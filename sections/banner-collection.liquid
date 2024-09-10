@@ -1,0 +1,201 @@
+<div class="flex flex-col my-8 px-4">
+    <div class="flex items-center justify-{{ section.settings.title_align }} w-full md:max-w-6xl mx-auto">
+        <h2 class="ml-4 capitalize ">{{ section.settings.title }} {{ blog.title |  escape }}</h2>
+        {% comment %} <a href="{{ section.settings.banner_collection.url }}" class="text-base hover:underline hover:bg-gray-400 bg-gray-200 px-3 rounded-md shadow-xl">View All</a> {% endcomment %}
+    </div>
+    <div class="w-full md:max-w-6xl mx-auto">
+        <div class="banner-slider">
+            
+        {% for block in section.blocks limit:section.settings.number_of_products_show%}
+            {% render 'banner-card', bannerData: block. %}
+        
+        {% endfor %} 
+        
+        {% comment %} {% for product in section.settings.banner_collection.products limit:section.settings.number_of_products_show %}
+            {% render 'product-card', productData: product %}
+        {% else %}
+            {% for item in (1..6) %}
+                {% render 'product-card-placeholder' %}
+            {% endfor %}
+        {% endfor %} {% endcomment %}
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        
+    });
+</script>
+
+{% schema %}
+{
+    "name": "Banner Collection",
+    "settings": [
+        {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+            "default": "banner collection"
+        },
+        {
+            "type": "select",
+            "id": "title_align",
+            "label": "Title Align",
+            "default": "center",
+            "options": [
+                {
+                    "label": "Left",
+                    "value": "start"
+                },
+                {
+                    "label": "Center",
+                    "value": "center"
+                },
+                {
+                    "label": "Right",
+                    "value": "end"
+                }
+            ] 
+        },
+        {
+            "type": "collection",
+            "id": "banner_collection",
+            "label": "Collection"
+        },
+        {
+            "type": "range",
+            "id": "number_of_products_show",
+            "min": 5,
+            "max": 15,
+            "default":5,
+            "step": 5,
+            "label": "Number of Products to show"
+        }     
+    ],
+    "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide1",
+      "limit": 20,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        },
+        {
+            "type": "checkbox",
+            "id": "show_btn",
+            "label": "Show Button",
+            "default": true
+        },
+        {
+          "type": "text",
+          "id": "btn_name",
+          "label": "Button Name"
+        }
+      ]
+    },
+    
+    {
+      "type": "slide2",
+      "name": "Slide2",
+      "limit": 20,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        },
+        {
+            "type": "checkbox",
+            "id": "show_btn",
+            "label": "Show Button",
+            "default": true
+        },
+        {
+          "type": "text",
+          "id": "btn_name",
+          "label": "Button Name"
+        },
+        {
+          "type": "image_picker",
+          "id": "image2",
+          "label": "Image2",
+        },
+        {
+          "type": "text",
+          "id": "title2",
+          "label": "Title2"
+        },
+        {
+          "type": "url",
+          "id": "url2",
+          "label": "URL2"
+        },
+        {
+            "type": "checkbox",
+            "id": "show_btn2",
+            "label": "Show Button2",
+            "default": true
+        },
+        {
+          "type": "text",
+          "id": "btn_name2",
+          "label": "Button Name2"
+        }
+      ]
+    }
+  ],
+    "presets": [
+        {
+            "name": "Banner Collection",
+            "blocks": [
+                {
+                "type": "slide"
+                },
+                {
+                "type": "slide"
+                },
+                {
+                "type": "slide"
+                },
+                {
+                "type": "slide"
+                },
+                {
+                "type": "slide"
+                },
+                {
+                "type": "slide"
+                },
+                {
+                "type": "slide"
+                }
+            ]
+        }
+    ]
+}
+{% endschema %}
+

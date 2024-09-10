@@ -1,0 +1,107 @@
+<div class="flex flex-col my-8 px-4">
+    <div class="flex items-center flex-col md:flex-row justify-between w-full md:max-w-6xl mx-auto">
+        <h2 class="capitalize" :class="{{section.settings.title_align}}">{{ section.settings.title }}</h2>
+        <div class="flex border hover:border-[#D4B872] bg-white px-3 py-2 shadow-xl">
+            <a href="{{ section.settings.featured_collection.url }}" class="text-base capitalize ">
+                load more 
+            </a>
+            {% include 'icon-arrow-right' %}
+        </div>
+            
+    </div>
+    <div class="w-full md:max-w-6xl mx-auto">
+        <div class="future-slider overflow-hidden">
+                {% for product in section.settings.category_collection.products limit:section.settings.number_of_products_show %}
+                    {% if section.settings.card_type == "box" %}
+                        {% render 'product-card', productData: product %}
+                    {% elsif section.settings.card_type == "circle" %}
+                        {% render 'product-circle', productData: product %}
+                    {% endif %} 
+                {% else %}
+                    {% for item in (1..6) %}
+                        {% render 'product-card-placeholder' %}
+                    {% endfor %}
+                {% endfor %}
+            
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    $(document).ready(function() {
+        
+    });
+</script>
+
+{% schema %}
+{
+    "name": "Category Collection",
+    "settings": [
+        {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+            "default": "category collection"
+        },
+        {
+            "type": "select",
+            "id": "title_align",
+            "label": "Title Align",
+            "default": "text-center",
+            "options": [
+                {
+                    "label": "Left",
+                    "value": "text-left"
+                },
+                {
+                    "label": "Center",
+                    "value": "text-center"
+                },
+                {
+                    "label": "Right",
+                    "value": "text-right"
+                }
+            ] 
+        },
+        {
+            "type": "collection",
+            "id": "category_collection",
+            "label": "Collection"
+        },
+        {
+            "type": "range",
+            "id": "number_of_products_show",
+            "min": 5,
+            "max": 15,
+            "default":5,
+            "step": 5,
+            "label": "Number of Products to show"
+        },
+        {
+            "type": "select",
+            "id": "card_type",
+            "label": "Card Type",
+            "default": "circle",
+            "options": [
+                {
+                    "label": "Box",
+                    "value": "box"
+                },
+                {
+                    "label": "Circle",
+                    "value": "circle"
+                }
+            ]
+        }     
+    ],
+    "presets": [
+        {
+            "name": "Category Collection"
+
+        }
+    ]
+}
+{% endschema %}
+

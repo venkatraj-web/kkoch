@@ -1,0 +1,155 @@
+{% comment %} <div class="w-full py-6 px-1 mx-4">
+    <div class="relative border bg-white shadow-lg rounded-lg overflow-hidden">
+        <a href="{{ bannerData.settings.url }}">
+            {% if bannerData.settings.image %}
+            <div class="h-[27.5rem] overflow-hidden">
+                <img class="!h-full object-cover transition duration-1000 ease-in-out hover:scale-105 transform"
+                    src="{{ bannerData.settings.image | img_url: 'grande' }}" alt="{{ bannerData.title }}">
+            </div>
+
+            {% else %}
+            {{ 'product-1' | placeholder_svg_tag: 'w-full h-[27.5rem] object-cover bg-gray-100' }}
+            {% endif %}
+        </a>
+
+        <div class="w-full gradient-box backdrop-blur-sm flex flex-col px-4 py-7 absolute bottom-0">
+
+            <h1 class="text-white capitalize font-bold text-2xl">
+                {% if bannerData.settings.title != blank %}
+                {{ bannerData.settings.title }}
+                {% else %}
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maiores, iste!
+                {% endif %}
+            </h1>
+            {% if bannerData.settings.show_btn %}
+            {% if bannerData.settings.url %}
+            <a href="{{ bannerData.settings.url }}" class="my-2 w-fit rounded-sm border border-white px-4 py-2">
+                <span class="text-sm text-white font-medium ">{{ bannerData.settings.btn_name }}</span>
+            </a>
+            {% else %}
+            <span class="text-sm my-2 w-fit rounded-sm text-white font-medium border border-white px-4 py-2">Choose
+                Now</span>
+
+            {% endif %}
+            {% endif %}
+        </div>
+
+    </div>
+</div> {% endcomment %}
+
+<div class="w-full py-6 px-1 mx-4">
+    {% if bannerData.type == 'slide' %}
+        <div class="relative border bg-white shadow-lg rounded-lg overflow-hidden">
+            <a href="{{ bannerData.settings.url }}">
+                {% if bannerData.settings.image %}
+                <div class="h-[30rem] overflow-hidden">
+                    <img class="!h-full object-cover transition duration-1000 ease-in-out hover:scale-105 transform"
+                        src="{{ bannerData.settings.image | img_url: 'grande' }}" alt="{{ bannerData.title }}">
+                </div>
+    
+                {% else %}
+                {{ 'product-1' | placeholder_svg_tag: 'w-full h-[30rem] object-cover bg-gray-100' }}
+                {% endif %}
+            </a>
+    
+            <div class="w-full gradient-box backdrop-blur-sm flex flex-col px-4 py-7 absolute bottom-0">
+    
+                <h1 class="text-white capitalize font-bold text-2xl">
+                    {% if bannerData.settings.title != blank %}
+                    {{ bannerData.settings.title }}
+                    {% else %}
+                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maiores, iste!
+                    {% endif %}
+                </h1>
+                {% if bannerData.settings.show_btn %}
+                {% if bannerData.settings.url %}
+                <a href="{{ bannerData.settings.url }}" class="my-2 w-fit rounded-sm border border-white px-4 py-2">
+                    <span class="text-sm text-white font-medium ">{{ bannerData.settings.btn_name }}</span>
+                </a>
+                {% else %}
+                <span class="text-sm my-2 w-fit rounded-sm text-white font-medium border border-white px-4 py-2">Choose
+                    Now</span>
+    
+                {% endif %}
+                {% endif %}
+            </div>
+    
+        </div>
+    {% elsif bannerData.type == 'slide2' %}
+        <div class="flex flex-col gap-4">
+            <div class="relative border bg-white shadow-lg rounded-lg overflow-hidden">
+                <a href="{{ bannerData.settings.url }}">
+                    {% if bannerData.settings.image %}
+                    <div class="h-[14.5rem] overflow-hidden">
+                        <img class="!h-full object-cover transition duration-1000 ease-in-out hover:scale-105 transform"
+                            src="{{ bannerData.settings.image | img_url: 'grande' }}" alt="{{ bannerData.title }}">
+                    </div>
+        
+                    {% else %}
+                    {{ 'product-1' | placeholder_svg_tag: 'w-full h-[14.5rem] object-cover bg-gray-100' }}
+                    {% endif %}
+                </a>
+        
+                <div class="w-full gradient-box backdrop-blur-sm flex flex-col px-4 py-3 absolute bottom-0">
+        
+                    <h1 class="text-white capitalize font-bold text-2xl">
+                        {% if bannerData.settings.title != blank %}
+                        {{ bannerData.settings.title }}
+                        {% else %}
+                        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maiores, iste!
+                        {% endif %}
+                    </h1>
+                    {% if bannerData.settings.show_btn %}
+                    {% if bannerData.settings.url %}
+                    <a href="{{ bannerData.settings.url }}" class="my-2 w-fit rounded-sm border border-white px-4 py-2">
+                        <span class="text-sm text-white font-medium ">{{ bannerData.settings.btn_name }}</span>
+                    </a>
+                    {% else %}
+                    <span class="text-sm my-2 w-fit rounded-sm text-white font-medium border border-white px-4 py-2">Choose
+                        Now</span>
+        
+                    {% endif %}
+                    {% endif %}
+                </div>
+        
+            </div>
+
+            <div class="relative border bg-white shadow-lg rounded-lg overflow-hidden">
+                <a href="{{ bannerData.settings.url2 }}">
+                    {% if bannerData.settings.image2 %}
+                    <div class="h-[14.5rem] overflow-hidden">
+                        <img class="!h-full object-cover transition duration-1000 ease-in-out hover:scale-105 transform"
+                            src="{{ bannerData.settings.image2 | img_url: 'grande' }}" alt="{{ bannerData.title2 }}">
+                    </div>
+        
+                    {% else %}
+                    {{ 'product-1' | placeholder_svg_tag: 'w-full h-[14.5rem] object-cover bg-gray-100' }}
+                    {% endif %}
+                </a>
+        
+                <div class="w-full gradient-box backdrop-blur-sm flex flex-col px-4 py-3 absolute bottom-0">
+        
+                    <h1 class="text-white capitalize font-bold text-2xl">
+                        {% if bannerData.settings.title2 != blank %}
+                        {{ bannerData.settings.title2 }}
+                        {% else %}
+                        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maiores, iste!
+                        {% endif %}
+                    </h1>
+                    {% if bannerData.settings.show_btn2 %}
+                    {% if bannerData.settings.url2 %}
+                    <a href="{{ bannerData.settings.url2 }}" class="my-2 w-fit rounded-sm border border-white px-4 py-2">
+                        <span class="text-sm text-white font-medium ">{{ bannerData.settings.btn_name2 }}</span>
+                    </a>
+                    {% else %}
+                    <span class="text-sm my-2 w-fit rounded-sm text-white font-medium border border-white px-4 py-2">Choose
+                        Now</span>
+        
+                    {% endif %}
+                    {% endif %}
+                </div>
+        
+            </div>
+        </div>
+    {% endif %}
+</div>

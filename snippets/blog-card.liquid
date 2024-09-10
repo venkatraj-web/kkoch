@@ -1,0 +1,54 @@
+{% comment %} <div class="w-full py-6 px-3">
+    <div class="bg-white shadow-xl rounded-lg overflow-hidden">
+        {% if article.image %}
+            <a href="{{ article.url }}">
+                <img class="w-full h-full object-cover transition duration-1000 ease-in-out hover:scale-105 transform" src="{{ article.image | img_url: 'medium' }}" alt="{{ article.image.alt }}">
+            </a>
+        {% else %}
+            {{ 'image' | placeholder_svg_tag: 'w-full h-80 object-cover bg-gray-100' }}
+        {% endif %}
+
+        <div class="p-4">
+            <h1 class="text-xl font-medium my-4">{{ article.title }}</h1>
+
+            {% if article.excerpt.size > 0 %}
+                <p>{{ article.excerpt | strip_html | truncatewords: 15 }}</p>
+            {% else %}
+                <p>{{ article.content | strip_html | truncatewords: 15 }}</p>
+            {% endif %}
+
+            <a href="{{ article.url }}" class="font-medium text-blue-600 hover:text-blue-800 my-4 block">{{ section.settings.blog_read_more }}</a>
+        </div>
+
+        
+    </div>
+    
+</div> {% endcomment %}
+
+<div class="w-full py-6 px-3">
+    <div class="border bg-white shadow-lg rounded-lg overflow-hidden">
+        <a href="{{ article.url }}">
+            {% if article.image %}
+                <div class="h-full overflow-hidden">
+                    <img class="w-full h-full object-cover transition duration-1000 ease-in-out hover:scale-105 transform" src="{{ article.image | img_url: 'medium' }}" alt="{{ article.image.alt }}">
+                </div>
+                
+            {% else %}
+                {{ 'product-1' | placeholder_svg_tag: 'w-full h-full object-cover bg-gray-100' }}
+            {% endif %}
+        </a>
+        
+        <div class="flex flex-col p-4">
+            <h1 class="text-xl font-medium my-4 capitalize">{{ article.title }}</h1>
+
+            {% if article.excerpt.size > 0 %}
+                <p>{{ article.excerpt | strip_html | truncatewords: 15 }}</p>
+            {% else %}
+                <p>{{ article.content | strip_html | truncatewords: 15 }}</p>
+            {% endif %}
+
+            <a href="{{ article.url }}" class="font-medium text-blue-600 hover:text-blue-800 my-4 block">{{ section.settings.blog_read_more }}</a>
+        </div>
+        
+    </div>
+</div>

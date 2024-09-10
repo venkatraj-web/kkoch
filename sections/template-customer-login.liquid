@@ -18,7 +18,7 @@
                         name="customer[email]"
                         id="email_address"
                         autocomplete="email"
-                        class="relative block w-full px-3 py-2 border"
+                        class="relative block w-full px-3 py-2 border rounded-xl"
                         placeholder="Email address"
                     >
                 </div>
@@ -30,7 +30,7 @@
                             name="customer[password]"
                             id="password"
                             autocomplete="current-password"
-                            class="relative block w-full px-3 py-2 border"
+                            class="relative block w-full px-3 py-2 border rounded-xl"
                             placeholder="Password"
                         >
                     </div>
@@ -42,9 +42,15 @@
                     </a>
                 </div>
                 <div>
-                    <button type="submit" class="relative w-full py-2 px-4 text-sm font-medium text-white bg-gray-600 hover:bg-gray-900">
+                    <button type="submit" class="relative w-full py-2 px-4 text-sm font-medium text-white bg-gray-600 hover:bg-gray-900 rounded-xl">
                         Sign in
                     </button>
+                </div>
+                <div class="my-2 text-sm">
+                    Don't have an account? 
+                    <a href="{{ routes.account_register_url }}" class="underline text-gray-500 hover:text-gray-900">
+                        Create Account
+                    </a>
                 </div>
             {% endform %}
         </div>

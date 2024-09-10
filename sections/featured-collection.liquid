@@ -1,20 +1,35 @@
-<div class="flex flex-col items-center my-8">
-    <h1 class="text-center text-3xl">{{ section.settings.title }}</h1>
-
-    <div class="max-w-6xl mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {% for product in section.settings.featured_collection.products limit: section.settings.number_of_products_to_show %}
-                {% render 'product-card', product_product: product %}
-            {% else %}
-                {% for item in (1..4) %}
-                    {% render 'product-card-placeholder' %}
+<div class="flex flex-col my-8 px-4">
+    <div class="flex items-center flex-col md:flex-row justify-between w-full md:max-w-6xl mx-auto">
+        <h2 class="capitalize ">{{ section.settings.title }}</h2>
+        <div class="flex border hover:border-[#D4B872] bg-white px-3 py-2 shadow-xl">
+            <a href="{{ section.settings.featured_collection.url }}" class="text-base capitalize ">
+                load more 
+            </a>
+            {% include 'icon-arrow-right' %}
+        </div>
+    </div>
+    <div class="w-full md:max-w-6xl mx-auto">
+        <div class="future-slider overflow-hidden">
+            
+                {% for product in section.settings.featured_collection.products limit:section.settings.number_of_products_show %}
+                    {% render 'product-card', productData: product %}
+                {% else %}
+                    {% for item in (1..6) %}
+                        {% render 'product-card-placeholder' %}
+                    {% endfor %}
                 {% endfor %}
-            {% endfor %}
+            
         </div>
     </div>
 </div>
 
 
+
+<script>
+    $(document).ready(function() {
+        
+    });
+</script>
 
 {% schema %}
 {
@@ -23,8 +38,28 @@
         {
             "type": "text",
             "id": "title",
-            "default": "Featured Collection",
-            "label": "Title"
+            "label": "Title",
+            "default": "featured collection"
+        },
+        {
+            "type": "select",
+            "id": "title_align",
+            "label": "Title Align",
+            "default": "text-center",
+            "options": [
+                {
+                    "label": "Left",
+                    "value": "text-left"
+                },
+                {
+                    "label": "Center",
+                    "value": "text-center"
+                },
+                {
+                    "label": "Right",
+                    "value": "text-right"
+                }
+            ] 
         },
         {
             "type": "collection",
@@ -33,17 +68,20 @@
         },
         {
             "type": "range",
-            "id": "number_of_products_to_show",
-            "min": 4,
-            "max": 12,
-            "default": 4,
-            "label": "Number of products to show"
-        }
+            "id": "number_of_products_show",
+            "min": 5,
+            "max": 15,
+            "default":5,
+            "step": 5,
+            "label": "Number of Products to show"
+        }     
     ],
     "presets": [
         {
             "name": "Featured Collection"
+
         }
     ]
 }
 {% endschema %}
+

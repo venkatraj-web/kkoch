@@ -1,172 +1,206 @@
-{% liquid 
-    if section.settings.menu.links == blank
-        assign main_menu_linklist = linklists[section.settings.menu].links
-    else
-        assign main_menu_linklist = section.settings.menu.links
-    endif
-%}
-
-<div class="relative bg-white" x-data="{ mobileMenuOpen: false, searchBarOpen: false }" x-cloak>
-    <div class="mx-auto px-4 sm:px-6">
-        <div class="flex justify-center items-center py-6 md:justify-start md:space-x-10">
-            <!-- STORE NAME / STORE LOGO -->
-            <div class="flex justify-start lg:flex-1 truncate">
-                <h1 class="text-xl font-bold truncate">{{ shop.name }}</h1>
-            </div>
-
-            <div class="-mr-2 -my-2 ml-3 md:hidden">
-                <button x-on:click="mobileMenuOpen = true" type="button" class="bg-white p-2 inline-flex items-center justify-center focus:outline-none">
-                    {% render 'icon-menu' %}
-                </button>
-            </div>
-            <!-- NAVIGATION MENU -->
-            <nav class="hidden md:flex space-x-10">
-
-                {% for link in main_menu_linklist %}
-                    {% if link.links != blank %}
-                        {% assign link_handle = link.handle | replace: '-', '_' %}
-                        <div class="relative" x-data="{ {{ link_handle }}: false }">
-                            <button type="button" x-on:click="{{ link_handle }} = ! {{ link_handle }}" class="inline-flex items-center">
-                                {{ link.title }}
-                                {% render 'icon-dropdown' %}
-                            </button>
-
-                            <div 
-                            x-transition:enter="transition ease-out duration-300"
-                            x-transition:enter-start="opacity-0 translate-y-3"
-                            x-transition:enter-end="opacity-100 translate-y-0"
-                            x-transition:leave="transition ease-out duration-300"
-                            x-transition:leave-start="opacity-100 translate-y-0"
-                            x-transition:leave-end="opacity-0 translate-y-3"
-                            x-show="{{ link_handle }}" @click.away="{{ link_handle }} = false" class="absolute z-10 -ml-5 mt-5 transform px-2 w-screen max-w-md sm:px-0 lg:ml-0 lg:left-1/2 lg:-translate-x-1/2">
-                                <div class="shadow-lg border ring-black ring-opacity-5 overflow-hidden rounded-lg">
-                                    <div class="relative grid gap-6 bg-white px-5 py-6 sm:gap-8 sm:p-8">
-                                        {% for childlink in link.links %}
-                                            <a href="{{ childlink.url }}" class="-m-3 p-3 flex items start rounded-lg hover:bg-gray-100">
-                                                <div class="ml-4">
-                                                    <p class="text-gray-900 text-base font-medium">
-                                                        {{ childlink.title }}
-                                                    </p>
-                                                </div>
-                                            </a>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% else %}
-                        <a href="{{ link.url }}" class="text-base text-gray-500 hover:text-gray-900">{{ link.title }}</a>
-                    {% endif %}
-                {% endfor %}
-            </nav>
-            <!-- CART BUTTON / ACCOUNT LINKS IF ENABLED -->
-            <div class="hidden md:flex items-center justify-end md:flex-1 space-x-5">
-                <button x-on:click="searchBarOpen = true" type="button" class="whitespace-nowrap text-base text-gray-500 hover:text-gray-900">
-                    {% render 'icon-search' %}
-                </button>
-                <a href="{{ routes.cart_url }}" class="whitespace-nowrap text-base text-gray-500 hover:text-gray-900">
-                    {% render 'icon-shopping-bag' %}
-                </a>
-
-                {% if shop.customer_accounts_enabled %}
-                    {% if customer %}
-                        <a href="{{ routes.account_url }}" class="text-base text-gray-500 hover:text-gray-900">account</a>
-                        {{ 'Log out' | customer_logout_link | replace: '<a', '<a class="text-base text-gray-500 hover:text-gray-900"' }}
-                    {% else %}
-                        {{ 'Log in ' | customer_login_link | replace: '<a', '<a class="text-base text-gray-500 hover:text-gray-900"' }}
-                        {{ 'Register' | customer_register_link | replace: '<a', '<a class="text-base text-gray-500 hover:text-gray-900"' }}
-                    {% endif %}
-                {% endif %}
-            </div>
-
-            <!-- MOBILE MENU CONTAINER -->
-            <div x-show="mobileMenuOpen" class="absolute z-10 top-0 inset-x-0 p-2 transform origin-top-left md:hidden">
-                <div class="shadow-lg rounded-lg ring-1 ring-black ring-opacity-5 bg-white w-full">
-                    <div class="p-5 divide-y-2 divide-gray-50">
-
-                        <!-- MOBILE MENU HEADER TITLE PLUS CLOSE BUTTON -->
-
-                        <div class="flex items-center justify-between pb-3">
-                            <div>
-                                <h1 class="text-lg text-gray-500">{{ section.settings.mobile_menu_title }}</h1>
-                            </div>
-                            <div class="-mr-2">
-                                <button x-on:click="mobileMenuOpen = false" type="button" class="bg-white rounded-md p-2 text-gray-500">
-                                    {% render 'icon-close' %}
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- NAVIGATION LINKS FOR MOBILE MENU -->
-                        <div class="pt-3">
-                            <nav class="grid gap-y-7">
-                                
-                                {% for link in main_menu_linklist %}
-                                    {% if link.links != blank %}
-                                    {% assign mobile_link_handle = link.handle | replace: '-', '_' %}
-                                        <div class="relative" x-data="{ {{ mobile_link_handle }}: false }">
-                                            <button x-on:click="{{ mobile_link_handle }} = ! {{ mobile_link_handle }}" type="button" class="text-base text-gray-500 hover:text-gray-900 flex items-center justify-between w-full">
-                                                <div>{{ link.title }}</div>
-                                                {% render 'icon-dropdown' %}
-                                            </button>
-
-                                            <div x-show="{{ mobile_link_handle }}" class="grid gap-y-7 py-3">
-                                                {% for childlink in link.links %}
-                                                    <a href="{{ childlink.url }}" class="-m-3 p-3 mt-2 flex items-center rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-50">
-                                                        <span class="ml-3 text-base font-medium text-gray-500">{{ childlink.title }}</span>
-                                                    </a>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    {% else %}
-                                        <a href="{{ link.url }}" class="-m-3 p-3 flex items-center rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-50">
-                                            {{ link.title }}
-                                        </a>
-
-                                    {% endif %}
-                                    
-                                {% endfor %}
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-            </div>
+{% assign main_menu_linklists = linklists[section.settings.menu].links %}
+{% comment %} {{ shop.customer_accounts_enabled }} {% endcomment %}
+<div id="navbar" class="cloud text-gray top-0 left-0 w-full z-[999] shadow-md transition-transform duration-300 transform translate-y-0" 
+ x-data="{ mobileMenuOpen: false, searchBarOpen: false,  isScrolled: false }"
+ x-init="window.addEventListener('scroll', () => { isScrolled = window.scrollY > 0; })"
+ x-bind:class="{ 'relative': !isScrolled, 'shadow-lg top-0': isScrolled }"
+ x-cloak
+>
+  <div class="">
+    <div class="flex">
+      <div class="w-4/12"></div>
+      <div class="w-4/12 flex justify-center items-center py-4 md:space-x-10">
+        <!-- STORE NAME / STORE LOGO -->
+        <div class="header__logo mx-auto my-2 md:my-0 md:mr-auto" style="max-width: {{ settings.logo_width }}px;">
+          <a href="{{ routes.root_url }}">
+            {% if settings.logo != blank %}
+              <a href="/" class="header__logo"> <img src="{{ settings.logo | img_url: 'large' }}" alt="kkoch"></a>
+            {% else %}
+              <a href="/" class="truncate uppercase">{{ shop.name }}</a>
+            {% endif %}
+          </a>
         </div>
-    </div>
 
-    <div x-show="searchBarOpen" class="w-full absolute top-0 bg-white border">
-        <button type="button" x-on:click="searchBarOpen = false" class="absolute top-0 right-0 mr-5 mt-5 text-gray-500">
-            {% render 'icon-close' %}
-        </button>
-        <div class="h-40 flex justify-center items-center">
-            <form action="{{ routes.search_url }}" method="get" class="flex-auto">
-                <div class="relative text-gray-500 px-10 border">
-                    <input type="search" name="q" placeholder="Search" class="w-full bg-white h-10 px-5 pr-10 rounded-full text-sm focus:outline-none">
-                    <button type="submit" class="absolute right-0 top-0 mt-2 mr-2 md:mr-20">
-                        {% render 'icon-search' %}
+      </div>
+      <div class="w-4/12 flex justify-center items-center py-4 px-2">
+        <div class="md:hidden ml-3 -my-2 -mr-2">
+          <button type="button" x-on:click="mobileMenuOpen = true"
+            class="bg-white inline-flex justify-center items-center p-2 focus:outline-none">
+            {% render 'icon-menu' %}
+          </button>
+        </div>
+          
+          <!-- CART BUTTON / ACCOUNT LINKS IF ENABLED -->
+          <div class="hidden md:flex items-center justify-end md:flex-1 space-x-5">
+            
+            <button
+            type="button"
+            title="Cart Button"
+            x-on:click="$dispatch('toggle-cart')"
+            class="header__icon text-center relative"
+          >
+            {% render 'icon-cart', class: '' %}
+            <span class="sr-only">Cart</span>
+            <span
+              x-text="cart_count"
+              class="cart__count min-w-[22px] text-sm min-h-[22px] absolute grid place-content-center rounded-full -top-3 -right-1"
+            >
+              {{- cart.item_count -}}
+            </span>
+          </button>
+            {% if shop.customer_accounts_enabled %}
+              {% if customer %}
+                <a href="{{ routes.account_url }}" class="whitespace-nowrap text-base text-black-500 hover:text-black-900">{% render 'icon-account' %}</a>
+                {% comment %} <a href="{{ routes.account_url }}" class="text-base text-black-500 hover:text-black-900 ">{{ 'Log out' |  customer_logout_link |  replace: '<a', '<a class="text-base text-black-500 hover:text-black-900"'  }}</a> {% endcomment %}
+                <a href="{{ routes.account_logout_url }}" class="text-base text-black-500 hover:text-black-900 rotate-180">{% render 'icon-login' %}</a>
+              {% else %}
+                {% comment %} <a href="{{routes.account_login_url}}" class="text-base text-black-500 hover:text-black-900">{{ 'Login' |  customer_login_link |  replace: '<a', '<a class="text-base text-black-500 hover:text-black-900"' }}</a> {% endcomment %}
+                {% comment %} <a href="{{routes.account_register_url}}" class="text-base text-black-500 hover:text-black-900">{{ 'Register' |  customer_register_link |  replace: '<a', '<a class="text-base text-black-500 hover:text-black-900"'  }}</a> {% endcomment %}
+                <a href="{{routes.account_login_url}}" class="text-base text-black-500 hover:text-black-900">{% render 'icon-account' %}</a>
+              {% endif %}
+            {% endif %}
+          </div>
+    
+          <!-- MOBILE MENU CONTAINER -->
+          <div x-show="mobileMenuOpen" class="absolute z-[999] top-0 inset-x-0 p-2 transform origin-top-left md:hidden">
+            <div class="shadow-lg rounded-lg bg-white ring-1 ring-black ring-opacity-5 w-full">
+              <div class="p-5 divide-y-2 divide-gray-50">
+                <!-- MOBILE MENU HEADER TITLE PLUS CLOSE BUTTON -->
+                <div class="flex justify-between items-center pb-3">
+                  <div>
+                    <h1 class="text-lg text-gray-500">{{shop.name}}</h1>
+                  </div>
+                  <div class="-mr-2">
+                    <button type="button" x-on:click="mobileMenuOpen = false" class="bg-white rounded-md p-2 text-gray-500">
+                      {% render 'icon-close' %}
                     </button>
+                  </div>
                 </div>
-            </form>
+    
+                <!-- NAVIGATION LINKS FOR MOBILE MENU -->
+                <div class="pt-3">
+                  <nav class="grid gap-y-7">
+                    {% for link in main_menu_linklists %} 
+                    {% assign link_handle = link.handle | replace: '-', '_'%}
+                    {% if link.links != blank %}
+                    <div class="relative" x-data="{ {{link_handle}}: false }">
+                      <button type="button" x-on:click="{{link_handle}} = !{{ link_handle }}"
+                        class="text-base text-gray-500 hover:text-gray-700 w-full flex items-center justify-between">
+                        <div>{{link.title}}</div>
+                        <div x-show="!{{ link_handle }}">
+                          {% render 'icon-dropdown' %}
+                        </div>
+                        <div x-show="{{ link_handle }}">
+                          {% render 'icon-dropdown', class: 'rotate-180' %}
+                        </div>
+                      </button>
+                      <div x-show="{{ link_handle }}" @click.away="{{ link_handle }}=false" class="grid gap-y-7 py-3 ">
+                        {% for childlink in link.links %}
+                        <a href="{{ childlink.url }}"
+                          class="-m-3 p-3 mt-2 flex items-center rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-50">
+                          <span class="ml-3 text-base font-medium text-gray-500">{{childlink.title}}</span>
+                        </a>
+                        {% endfor %}
+                      </div>
+                    </div>
+                    {% else %}
+    
+                    <a href="{{link.url}}"
+                      class="p-3 -m-3 flex items-center rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-50">
+                      {{link.title}}
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+    
+                    <a href="{{ routes.account_url }}" class="whitespace-nowrap text-base text-gray-500 hover:text-gray-900">{% render 'icon-account' %}</a>
+                
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
+          
         </div>
     </div>
+    <div class="hidden md:block">
+      <div id="menu" class="p-4 flex justify-center">
+        <!-- NAVIGATION MENU -->
+        {% liquid
+          if section.settings.menu_type_desktop == 'dropdown'
+             render 'header-dropdown-menu' , main_menu_linklists: main_menu_linklists  
+          elsif section.settings.menu_type_desktop == 'mega'
+             render 'header-mega-menu' , main_menu_linklists: main_menu_linklists
+          endif
+        %}
+  
+        <button type="button" x-on:click="searchBarOpen = true" class="ml-4 whitespace-nowrap text-base text-white-500 hover:text-gray-900">
+            {% render 'icon-search' %}
+          </button>
+      </div>
+    </div>
+  </div>
+
+  <div x-show="searchBarOpen" class="w-full border cloud absolute top-0">
+    <button type="button" x-on:click="searchBarOpen = false" class="absolute top-0 right-0 mr-5 mt-5 text-gray-500">
+      {% render 'icon-close' %}
+    </button>
+    <div class="h-40 max-w-md mx-auto flex justify-center items-center">
+      <form action="{{ routes.search_url }}" method="get" class="flex-auto">
+        <div class="relative px-10 text-gray-500">
+          <input type="search" name="q" placeholder="Search" class="border w-72 bg-white h-10 px-5 rounded-full text-sm focus:outline-none">
+          <button type="submit" class="absolute top-0 right-1 mt-1 mr-2 md:mr-20 bg-white p-1 rounded-full">
+            {% render 'icon-search' %}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var navbar = document.getElementById('navbar');
+    var menu1 = document.getElementById('menu1');
+    var menu = navbar.querySelector('#menu');
+    
+  });
+</script>
 
 {% schema %}
 {
-    "name": "Header",
-    "settings": [
+  "name": "Header",
+  "tag": "header",
+  "class": "shopify-section sticky top-0 z-999",
+  "settings": [
+    {
+      "type": "text",
+      "id": "mobile_menu_title",
+      "label": "Title"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "select",
+      "id": "menu_type_desktop",
+      "options": [
         {
-            "type": "text",
-            "id": "mobile_menu_title",
-            "default": "Menu",
-            "label": "Mobile Menu Title"
+          "value": "dropdown",
+          "label": "DropDown"
         },
         {
-            "type": "link_list",
-            "id": "menu",
-            "default": "main-menu",
-            "label": "Heading Navigation Menu"
+          "value": "mega",
+          "label": "Mega"
         }
-    ]
+      ],
+      "default": "mega",
+      "label": "Dropdown",
+      "info": "Dropdown"
+    }
+  ]
 }
 {% endschema %}

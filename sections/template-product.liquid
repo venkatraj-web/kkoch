@@ -1,177 +1,208 @@
-<link rel="stylesheet" href="https://cdn.shopify.com/shopifycloud/model-viewer-ui/assets/v1.0/model-viewer-ui.css">
-<link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
-<script src="https://unpkg.com/swiper@7/swiper-bundle.min.js" defer></script>
 
-{% assign selected_variant = product.selected_or_first_available_variant %}
+{% assign selected_variant = product.selected_or_first_available_variant
+ %}
+{% assign product_form_id = 'product-form-' |  append: section.id %}
 
-<script src="{{ 'product-model.js' | asset_url }}" defer></script>
-
-<style>
-    .swiper-button-prev, .swiper-button-next { color: black; top: auto !important; height: 20px; }
-    .swiper-button-prev::after, .swiper-button-next::after { font-size: 20px; }
-    .swiper-pagination { color: black; bottom: 0 !important; }
-    .swiper-pagination-bullet-active { background: black !important; }
-    .product--information { height: fit-content; }
-</style>
-
-<div x-data="{ productModalOpen: false }">
-
-    <div class="max-w-6xl mx-auto my-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div class="product--medias">
-                <div class="hidden md:block">
-                    {% for media in product.media %}
-                        <div class="h-100 overflow-hidden p-2">
-                            {% render 'product-media', media: media %}
-                        </div>
-                    {% endfor %}
+<div class="max-w-6xl mx-auto my-8 px-2">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="product--medias">
+            <div class="md:block">
+                <div class="product-slider product_gallery">
+                    {% if product.images.size > 1 %}
+                        {% for image in product.images %}
+                            <div class="slick-slide">
+                                <a href="{{ image |  img_url: '1200x' }}" title="{{ image.alt | escape }}">
+                                    <img src="{{ image | img_url: '600x', crop: 'center' }}" width="50" class="px-2" alt="{{ image.alt | escape}}">
+                                </a>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
 
-                <div class="md:hidden">
-                    <div class="swiper">
-                        <div class="swiper-wrapper">
-                            {% for media in product.media %}
-                                <div class="swiper-slide">
-                                    <div class="h-[100vw] overflow-hidden p-2">
-                                        {% render 'product-media', media: media %}
-                                    </div>
+                <div class="hidden md:block">
+                    <div class="product-slider-nav mt-4">
+                        {% if product.images.size > 1 %}
+                            {% for image in product.images %}
+                                <div class="slick-slide">
+                                    <img src="{{ image.src | img_url: '200x150', crop: 'center' }}" width="50" class="px-2" alt="{{ image.alt }}">
                                 </div>
                             {% endfor %}
-                        </div>
-
-                        <div class="swiper-pagination"></div>
-
-                        <div class="swiper-button-prev"></div>
-                        <div class="swiper-button-next"></div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
 
-            <div class="product--information sticky top-5 p-2">
-                {% form 'product', product, id: 'product-form', novalidate: 'novalidate' %}
-                    <input type="hidden" name="id" value="{{ selected_variant.id }}">
-
-                    {% for block in section.blocks %}
-                        {% case block.type %}
-                            {% when 'vendor' %}
-                                <div class="my-3">
-                                    <span class="text-xs text-gray-500">{{ product.vendor }}</span>
-                                </div>
-                            {% when 'title' %}
-                                <div class="my-3">
-                                    <h1 class="text-3xl text-gray-900">{{ product.title }}</h1>
-                                </div>
-                            {% when 'price' %}
-                                <div class="my-3" id="price-{{ section.id }}">
-                                    <span class="text-base text-gray-500 line-through">{{ selected_variant.compare_at_price | money }}</span>
-                                    <span class="text-lg text-gray-900">{{ selected_variant.price | money }}</span>
-
-                                    {% if selected_variant.price < selected_variant.compare_at_price %}
-                                        <span class="px-5 py-1 text-sm font-bold bg-red-500 rounded-full text-white mx-4">Sale</span>
-                                    {% endif %}
-                                </div>
-                            {% when 'variant_selector' %}
-                                <div class="my-3">
-                                    {% unless product.has_only_default_variant %}
-                                        <variant-selector data-url="{{ product.url }}" data-section="{{ section.id }}">
+            {% comment %} mobile devices {% endcomment %}
+             
+        </div>
+        <div class="product--information sticky top-5" 
+            x-data="{ 
+                qty : 1,
+                addToCart() {
+                    {% comment %} let formData = new FormData(document.querySelector('#{{ product_form_id }}')); {% endcomment %}
+                    let formData = new FormData($refs.product_form);
+                    
+                    fetch('/cart/add.js', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        return response.json();
+                    })
+                    .then(response => {
+                        this.$dispatch('cart-updated');
+                        this.$dispatch('toggle-cart');
+                        {% comment %} console.log('Add to cart', response); {% endcomment %}
+                    })
+                    .catch(error => {
+                        console.log('Error', error);
+                    });
+                }
+            }">
+             {% form 'product', product, id: product_form_id, novalidate: 'novalidate', data-type: 'add-to-cart-form', x-ref: 'product_form' %}
+                <input type="hidden" name="id" id="product-form-variant-id" value="{{ selected_variant.id }}">
+                <input type="hidden" name="qty" name="quantity" value="1">
+                {% for block in section.blocks %}
+                    {% case block.type %}
+                        {% when '@app' %}
+                            {% render block %}
+                        {% when 'vendor' %}
+                            <div class="my-3">
+                                <span class="text-xs to-gray-500">{{ product.vendor }}</span>
+                            </div>
+                        {% when 'title' %}
+                            <div class="my-3">
+                                <h1 class="text-3xl text-gray-900">{{ product.title }}</h1>
+                            </div>
+                        {% when 'price' %}
+                            <div class="my-3" id="price-{{ section.id }}">
+                                <span class="text-base text-gray-500 line-through">{{ selected_variant.compare_at_price |  money }}</span>
+                                <span class="text-lg text-gray-900">{{selected_variant.price |  money}}</span>
+                                {% if selected_variant.compare_at_price > selected_variant.price %}
+                                    <span class="px-5 py-1 text-sm bg-red-500 rounded-full text-white font-bold mx-4">sale</span>
+                                {% endif %}
+                            </div>
+                        {% when 'variant_selector' %}
+                            <div class="my-3">
+                                {% unless product.has_only_default_variant %}
+                                    <variant-selector data-url="{{ product.url }}" data-section="{{ section.id }}">
+                                        <div class="flex gap-3">
                                             {% for option in product.options_with_values %}
-                                                <label for="Option-{{ section.id }}-{{ forloop.index0 }}">{{ option.name }}</label>
-
-                                                <div class="my-2">
-                                                    <select 
-                                                        name="options[{{ option.name | escape }}]" 
-                                                        id="Option-{{ section.id }}-{{ forloop.index0 }}" 
-                                                        class="w-full border py-3 px-3"
-                                                    >
-                                                        {% for value in option.values %}
-                                                            <option 
-                                                                value="{{ value | escape }}"
-                                                                {% if option.selected_value == value %}
+                                                <div class="w-1/2">
+                                                    <label for="Option-{{section.id}}-{{ forloop.index0 }}">{{ option.name }}</label>
+                    
+                                                    <div class="my-2">
+                                                        <select name="options[{{option.name |  escape}}]" id="Option-{{section.id}}-{{ forloop.index0 }}" class="w-full border py-2 px-3">
+                                                            {% for value in option.values %}
+                                                                <option value="{{ value |  escape }}" {% if option.selected_value == value %}
                                                                     selected="selected"
-                                                                {% endif %}
-                                                            >
-                                                                {{ value }}
-                                                            </option>
-                                                        {% endfor %}
-                                                    </select>
+                                                                {% endif %}>{{ value }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+        
+                                                    <script type="application/json">
+                                                        {{ product.variants |  json }}
+                                                    </script>
+
                                                 </div>
-
-                                                <script type="application/json">
-                                                    {{ product.variants | json }}
-                                                </script>
-
                                             {% endfor %}
-                                        </variant-selector>
-                                    {% endunless %}
+                                        </div>
+                                    </variant-selector>
+                                {% endunless %}
+                            </div>
+                        {% when 'quantity' %}
+                            {% comment %} <div class="my-3">
+                                <label for="Quantity-{{section.id}}">Quantity</label>
+                                <div class="my-2">
+                                    <input type="number" name="quantity" id="Quantity-{{section.id}}" value="1" min="1" class="w-full border px-3 py-3">
                                 </div>
+                            </div> {% endcomment %}
 
-                            {% when 'quantity' %}
-                                <div class="my-3">
-                                    <label for="Quantity-{{ section.id }}">Quantity</label>
-
-                                    <div class="my-2">
-                                        <input type="number" name="quantity" id="Quantity-{{ section.id }}" value="1" min="1" class="w-full border px-3 py-3">
-                                    </div>
-                                </div>
-                            {% when 'description' %}
-                                <div class="my-3">
-                                    <p class="text-gray-700">{{ product.description }}</p>
-                                </div>
-
-                            {% when 'checkout_buttons' %}
-                                <div class="my-3">
-                                    <button type="submit" name="add" class="w-full px-6 py-4 bg-gray-900 text-white hover:bg-gray-700 rounded-sm my-2"
-                                        {% if selected_variant.available == false %}
-                                            disabled
-                                        {% endif %}
-                                    >
-                                        {% if selected_variant.available == false %}
-                                            Sold out
-                                        {% else %}
-                                            Add to cart
-                                        {% endif %}
+                            <div class="product-form__input product-form__quantity">
+                                <label class="form__label sr-only" for="Quantity-{{ section.id }}">
+                                    {{ 'products.product.quantity.label' | t }}
+                                </label>
+                                <div class="product-qty__wrapper grid grid-cols-3 border border-black"
+                                x-data="{
+                                    qty: 1,
+                                    minus(value) {
+                                        this.qty = parseInt(this.qty);
+                                        (this.qty == 1) ? this.qty = 1 : this.qty -= value;
+                                    },
+                                    plus(value) {
+                                        this.qty = parseInt(this.qty);
+                                        this.qty += value;
+                                    }
+                                }"
+                                x-init="$watch('qty', )"
+                                >
+                                <button type="button" class=" min-h-[40px] w-full flex items-center justify-center cursor-pointer" @click="minus(1)">
+                                    <span class="sr-only">{{ 'products.product.quantity.decrease' | t: product: product.title | escape }}</span>
+                                    {% render 'icon-minus' %}
+                                    </button>
+                                    <input type="number" x-model="qty" name="quantity" class="product-qty__input border-x text-center border-black" value="1" min="1" max="10">
+                                    <button type="button" class=" min-h-[40px] w-full flex items-center justify-center cursor-pointer" @click="plus(1)">
+                                        <span class="sr-only">{{ 'products.product.quantity.decrease' | t: product: product.title | escape }}</span>
+                                        {% render 'icon-plus' %}
                                     </button>
                                 </div>
-                            {% else %}
-                                
-                        {% endcase %}
-                    {% endfor %}
-                {% endform %}
-            </div>
+                            </div>
+                        {% when 'description' %}
+                            <div class="my-3">
+                                <p class="text-gray-700">{{ product.description }}</p>
+                            </div>
+                        {% when 'checkout_buttons' %}
+                            <div class="my-3">
+                                <button type="button" name="add"
+                                    @click="addToCart()"
+                                    class="add-to-cart-button w-full border px-6 py-4 text-white bg-gray-900 hover:bg-gray-700 rounded-sm my-2"
+                                    {% if selected_variant.available == false %}
+                                        disabled="disabled"
+                                    {% endif %}
+                                >
+                                {% if selected_variant.available == false %}
+                                    Sold out
+                                {% else %}
+                                    Add to Cart
+                                {% endif %}
+                                </button>
+                            </div>
+                        {% else %}
+                            
+                    {% endcase %}
+                {% endfor %}
+
+             {% endform %}
+
+
         </div>
     </div>
 
-    <style>
-        .media model-viewer, .media > * {
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-    </style>
+    <div x-data="{ tab: 'tab1' }">
+                <div class="flex">
+                    <button class="px-4 py-2 bg-gray-200" :class="{ 'bg-blue-500 underline': tab === 'tab1' }" @click="tab = 'tab1'">Shipping</button>
+                    <button class="px-4 py-2 bg-gray-200" :class="{ 'bg-blue-500 underline': tab === 'tab2' }" @click="tab = 'tab2'">Returns</button>
+                </div>
 
-    <div id="productModelModal">
-        <div x-show="productModalOpen" class="w-full h-full z-50 items-center fixed inset-0">
-            <div class="relative w-full h-full bg-white">
-                <div class="relative">
-                    <div class="flex justify-between items-start p-5 border-b">
-                        <h2 class="text-xl font-bold text-gray-700">3D Model Preview</h2>
-                        <button x-on:click="productModalOpen = false" class="text-gray-400 bg-transparent hover:text-gray-700 rounded text-sm p-2 ml-auto inline-flex items-center">
-                            {% render 'icon-close' %}
-                        </button>
-                    </div>
-
-                    <div id="body" class="media block relative" style="padding-top: min(calc(100vh - 5rem), 100%);">
-
-                    </div>
+                <div x-show="tab === 'tab1'" class="p-2">
+                   <p>
+                       {{ shop.shipping_policy }}
+                        Shipping Policy Details   
+    
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto, quisquam!
+                   </p>
+                </div>
+                <div x-show="tab === 'tab2'" class="p-2">
+                    Return Details
+                    A stunning arrangement of white eustoma flowers and pink tulips beautifully presented in a fishbowl glass vase. Arranged with precision and passion, this arrangement exudes timeless charm and understated luxury. The delicate petals of the white eustoma symbolize appreciation and gratitude, while the vibrant pink tulips evoke feelings of joy and admiration, making it a perfect gift for any occasion. Nestled within the sleek fishbowl glass vase, these blooms create a captivating centerpiece that will brighten any space and uplift spirits. Experience the artistry of nature and the allure of exquisite design with our white eustoma and pink tulip arrangement. 
                 </div>
             </div>
-        </div>
-    </div>
-
 </div>
+ 
+
+{% comment %} {% include 'product-recommendations' %} {% endcomment %}
+
 <script>
     class VariantSelector extends HTMLElement {
         constructor() {
@@ -180,6 +211,7 @@
         }
 
         onVariantChange() {
+            // console.log("I have chenged the variant selector");
             this.getSelectedOptions();
             this.getSelectedVariant();
 
@@ -188,11 +220,12 @@
                 this.updateFormID();
                 this.updatePrice();
             }
+
         }
 
         getSelectedOptions() {
-            this.options = Array.from(this.querySelectorAll('select'), (select) => select.value);
-            console.log(this.options);
+             this.options = Array.from(this.querySelectorAll('select'), (select) => select.value);
+            //  console.log(this.options);
         }
 
         getVariantJSON() {
@@ -201,43 +234,46 @@
         }
 
         getSelectedVariant() {
+            // console.log(this.getVariantJSON());
             this.currentVariant = this.getVariantJSON().find(
                 (variant) => {
                     const findings = !variant.options.map(
                         (option, index) => {
                             return this.options[index] === option;
                         }
+                        // Important Area again Learn once more!!!
                     ).includes(false);
-
+                    // console.log(findings);
                     if(findings) return variant;
                 }
             );
-
-            console.log(this.currentVariant);
+            // console.log(this.currentVariant);
         }
 
         updateURL() {
             if(!this.currentVariant) return;
+
             window.history.replaceState({}, '', `${this.dataset.url}?variant=${this.currentVariant.id}`);
         }
 
         updateFormID() {
-            const form_input = document.querySelector("#product-form").querySelector('input[name="id"]');
+            const form_input = document.querySelector("#product-form-variant-id");
             form_input.value = this.currentVariant.id;
+            // console.log(this.currentVariant);
         }
 
         updatePrice() {
-            fetch(`${this.dataset.url}?variant=${this.currentVariant.id}&section_id=${this.dataset.section}`)
-            .then((response) => response.text())
-            .then((responseText) => {
+             fetch(`${this.dataset.url}?variant=${this.currentVariant.id}&section_id=${this.dataset.section}`)
+             .then((response) => response.text())
+             .then((responseText) => {
                 const id = `price-${this.dataset.section}`;
                 const html = new DOMParser().parseFromString(responseText, 'text/html');
-
+                // console.log(html);
                 const oldPrice = document.getElementById(id);
                 const newPrice = html.getElementById(id);
 
                 if(oldPrice && newPrice) oldPrice.innerHTML = newPrice.innerHTML;
-            });
+             });
         }
     }
 
@@ -245,28 +281,18 @@
 </script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        try {
-            const swiper = new Swiper('.swiper', {
-                    direction: 'horizontal',
 
-                    pagination: {
-                        el: '.swiper-pagination'
-                    },
+    $(document).ready(function() {
 
-                    navigation: {
-                        prevEl: '.swiper-button-prev',
-                        nextEl: '.swiper-button-next'
-                }
-            })
-        } catch(e) { console.log("SwiperJS is not defined"); }
-    })
-    
+        
+
+    });
+
 </script>
 
 {% schema %}
 {
-    "name": "Product",
+    "name": "Prooduct",
     "blocks": [
         {
             "type": "vendor",

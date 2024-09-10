@@ -1,0 +1,135 @@
+
+<div class="flex flex-col my-8 px-4">
+    <div class="flex items-center flex-col md:flex-row justify-{{ section.settings.title_align }} w-full md:max-w-6xl mx-auto mb-4">
+        <h2 class=" capitalize ">{{ section.settings.title }}</h2>
+    </div>
+    <div class="w-full md:max-w-6xl mx-auto mt-6">
+        <div class="sub_category-slider overflow-hidden ">
+            
+                {% for block in section.blocks%}
+                    <a href="{{ block.settings.url }}">
+                        <div class="flex flex-col items-center justify-center py-4 mx-2">
+                            <div class="!w-40 h-40 justify-items-center">
+                                <img src="{{ block.settings.image | img_url: 'medium' }}" class="!w-40 object-cover shadow-lg transition delay-75 ease-in-out hover:shadow-2xl hover:scale-[1.1]" alt="{{ block.settings.title }}">
+                            </div>
+                            <h2 class="!mt-6">{{ block.settings.title }}</h2>
+                        </div>
+                    </a>
+                
+                {% endfor %}
+            
+        </div>
+    </div>
+</div>
+<script>
+  $(document).ready(function(){
+    
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Image Section",
+  "tag": "section",
+  "class": "image-slider-section",
+  "settings": [
+    {
+        "type": "text",
+        "id": "title",
+        "label": "Title"
+        },
+        {
+          "type": "select",
+          "id": "title_align",
+          "label": "Title Align",
+          "default": "center",
+          "options": [
+              {
+                  "label": "Left",
+                  "value": "start"
+              },
+              {
+                  "label": "Center",
+                  "value": "center"
+              },
+              {
+                  "label": "Right",
+                  "value": "end"
+              }
+          ]
+        }
+      ],
+      "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "limit": 20,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        },
+        {
+          "type": "select",
+          "id": "shape",
+          "label": "Shapes",
+          "default": "square",
+          "options": [
+            {
+              "label": "Square",
+              "value": "square"
+            },
+            {
+              "label": "Circle",
+              "value": "circle"
+            },
+            {
+              "label": "Avatar",
+              "value": "avatar"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image Slider",
+      "blocks": [
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
